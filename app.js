@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
+require('dotenv').config()
 
 //setup express
 const app = express();
@@ -12,7 +13,7 @@ app.use(express.static("public"));
 
 //setup mongoose
 //mongoose.connect("mongodb://127.0.0.1:27017/wikiDB");
-mongoose.connect("mongodb+srv://admin-kevin:Test123456@cluster0.6ehnxuj.mongodb.net/wikiDB");
+mongoose.connect(process.env.DATABASE_URI);
 const articleSchema = new mongoose.Schema({
     title:{type:String,required:true},
     content:{type:String,required:true}
@@ -34,15 +35,15 @@ app.route("/articles")
 })
 .post(async (req,res)=>{
     console.log("New Post!!");
-    console.log(req.body);
     newArticle = new Articles({
         title: req.body.title,
         content: req.body.content
     });
     await newArticle.save().then(()=>{
         res.send("New post Created!!");
-    }).catch(()=>{
-        res.send(400);
+    }).catch((err)=>{
+        console.log(err);
+        res.sendStatus(400);
     });   
 })
 .delete((req,res)=>{
